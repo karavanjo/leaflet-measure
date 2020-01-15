@@ -17,7 +17,8 @@
     "length",
     "area",
     "polygon",
-    "path"
+    "path",
+    "nextgis"
   ],
   "author": "LJA Engineering, Inc - GIS <gisdev@ljaengineering.com>",
   "license": "MIT",

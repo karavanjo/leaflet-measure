@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <title>leaflet-measure</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin=""/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha384-eS4bw6aEvhCSXWGP85ANR/N8isWKzT7P36NvcuTJGkrj6wsbxLVpXslrNXYHyseD"
+        crossorigin=""/>
   <link rel="stylesheet" href="leaflet-measure.css">
   <style>
     body {
@@ -15,33 +17,41 @@
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
     }
+
     body {
       margin: 0 20px 20px;
     }
+
     h1, h2 {
       margin: 20px 0 0;
       font-size: 1.4em;
       font-weight: normal;
       line-height: 1;
     }
+
     h1 {
       display: inline-block;
       font-size: 1.4em;
     }
+
     h2 {
       font-size: 1.1em;
     }
+
     pre {
       line-height: 1.5em;
     }
+
     p.github {
       display: inline-block;
       margin: 20px 0 0 20px;
       font-size: 1.2em;
     }
+
     a, a:visited, a:hover, a:active, a:focus {
       text-decoration: none;
     }
+
     #map {
       height: 500px;
       margin: 20px 20px 0 0;
@@ -73,22 +83,22 @@
         writeResults(evt);
       });
 
-      function writeResults(results) {
-        document.getElementById('eventoutput').innerHTML = JSON.stringify(
-          {
-            area: results.area,
-            areaDisplay: results.areaDisplay,
-            lastCoord: results.lastCoord,
-            length: results.length,
-            lengthDisplay: results.lengthDisplay,
-            pointCount: results.pointCount,
-            points: results.points
-          },
-          null,
-          2
-        );
-      }
-    })(window.L, window.document);
-  </script>
+    function writeResults(results) {
+      document.getElementById('eventoutput').innerHTML = JSON.stringify(
+        {
+          area: results.area,
+          areaDisplay: results.areaDisplay,
+          lastCoord: results.lastCoord,
+          length: results.length,
+          lengthDisplay: results.lengthDisplay,
+          pointCount: results.pointCount,
+          points: results.points
+        },
+        null,
+        2
+      );
+    }
+  })(window.L, window.document);
+</script>
 </body>
 </html>
