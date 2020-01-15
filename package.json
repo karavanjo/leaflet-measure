@@ -1,11 +1,11 @@
 {
-  "name": "leaflet-measure",
-  "version": "3.1.0",
+  "name": "@nextgis/leaflet-measure",
+  "version": "0.0.1",
   "description": "Coordinate, linear, and area measure tool for Leaflet maps",
   "main": "dist/leaflet-measure.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ljagis/leaflet-measure.git"
+    "url": "git://github.com/nextgis/leaflet-measure"
   },
   "keywords": [
     "leaflet",
@@ -17,9 +17,10 @@
     "length",
     "area",
     "polygon",
-    "path"
+    "path",
+    "nextgis"
   ],
-  "author": "LJA Engineering, Inc - GIS <gisdev@ljaengineering.com>",
+  "author": "LJA Engineering, Inc - GIS <gisdev@ljaengineering.com>, NextGIS - <info@nextgis.com>",
   "license": "MIT",
   "scripts": {
     "lint": "eslint --ext js src/",
@@ -67,6 +68,6 @@
     "webpack-dev-server": "^2.11.1"
   },
   "peerDependencies": {
-    "leaflet": "^1.0.0"
+    "leaflet": "^1.6.0"
   }
 }
