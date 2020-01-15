@@ -31,6 +31,12 @@ L.Control.Measure = L.Control.extend({
   _className: 'leaflet-control-measure',
   options: {
     units: {},
+    controls: true,
+    measure: {
+      area: true,
+      length: true
+    },
+    labels: true,
     position: 'topright',
     primaryLengthUnit: 'feet',
     secondaryLengthUnit: 'miles',
@@ -39,29 +45,46 @@ L.Control.Measure = L.Control.extend({
     completedColor: '#C8F2BE', // base color for permenant features generated from completed measure
     captureZIndex: 10000, // z-index of the marker used to capture measure events
     popupOptions: {
-      // standard leaflet popup options http://leafletjs.com/reference-1.3.0.html#popup-option
       className: 'leaflet-measure-resultpopup',
       autoPanPadding: [10, 10]
     }
   },
+
   initialize: function(options) {
     L.setOptions(this, options);
     const { activeColor, completedColor } = this.options;
     this._symbols = new Symbology({ activeColor, completedColor });
     this.options.units = L.extend({}, units, this.options.units);
   },
+
   onAdd: function(map) {
     this._map = map;
     this._latlngs = [];
-    this._initLayout();
-    map.on('click', this._collapse, this);
+
+    if (this.options.controls) {
+      this._initLayout();
+      map.on('click', this._collapse, this);
+    } else {
+      this._container = L.DomUtil.create('div');
+    }
+
     this._layer = L.layerGroup().addTo(map);
     return this._container;
   },
+
   onRemove: function(map) {
     map.off('click', this._collapse, this);
     map.removeLayer(this._layer);
   },
+
+  start: function() {
+    this._startMeasure();
+  },
+
+  finish: function() {
+    this._finishMeasure();
+  },
+
   _initLayout: function() {
     const className = this._className,
       container = (this._container = L.DomUtil.create('div', `${className} leaflet-bar`));
@@ -141,6 +164,7 @@ L.Control.Measure = L.Control.extend({
     dom.hide(this.$startPrompt);
     dom.show(this.$measuringPrompt);
   },
+
   // get state vars and interface ready for measure
   _startMeasure: function() {
     this._locked = true;
@@ -169,7 +193,7 @@ L.Control.Measure = L.Control.extend({
 
     this._map.fire('measurestart', null, false);
   },
-  // return to state with no measure in progress, undo `this._startMeasure`
+
   _finishMeasure: function() {
     const model = L.extend({}, this._resultsModel, { points: this._latlngs });
 
@@ -198,7 +222,7 @@ L.Control.Measure = L.Control.extend({
 
     this._map.fire('measurefinish', model, false);
   },
-  // clear all running measure data
+
   _clearMeasure: function() {
     this._latlngs = [];
     this._resultsModel = null;
@@ -216,11 +240,11 @@ L.Control.Measure = L.Control.extend({
     this._measureArea = null;
     this._measureBoundary = null;
   },
-  // centers the event capture marker
+
   _centerCaptureMarker: function() {
     this._captureMarker.setLatLng(this._map.getCenter());
   },
-  // set icon on the capture marker
+
   _setCaptureMarkerIcon: function() {
     this._captureMarker.setIcon(
       L.divIcon({
@@ -440,9 +464,16 @@ L.Control.Measure = L.Control.extend({
   },
   // add various measure graphics to map - vertex, area, boundary
   _addNewVertex: function(latlng) {
-    L.circleMarker(latlng, this._symbols.getSymbol('measureVertexActive')).addTo(
-      this._measureVertexes
-    );
+    const vertexMarker = L.circleMarker(latlng, this._symbols.getSymbol('measureVertexActive'));
+
+    if (this.options.labels) {
+      vertexMarker.bindTooltip('Test Label', {
+        permanent: true,
+        direction: 'left'
+      });
+    }
+
+    vertexMarker.addTo(this._measureVertexes);
   },
   _addMeasureArea: function(latlngs) {
     if (latlngs.length < 3) {
