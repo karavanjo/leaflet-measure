@@ -1,6 +1,9 @@
-# leaflet-measure
+# @nextgis/leaflet-measure
 
-Coordinate, linear, and area measure control for [Leaflet](http://leafletjs.com) maps. Extends [L.Control](http://leafletjs.com/reference.html#control).
+Modified coordinate, linear, and area measure control for [Leaflet](http://leafletjs.com) maps. 
+Forked from base [leaflet-measure](https://github.com/ljagis/leaflet-measure) repository.
+
+
 
 <hr>
 

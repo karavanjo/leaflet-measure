@@ -8,6 +8,7 @@ import * as dom from './dom';
 import { selectOne as $ } from './dom';
 import Symbology from './symbology';
 import { numberFormat } from './utils';
+import en from '../languages/en';
 
 import {
   controlTemplate,
@@ -29,7 +30,9 @@ const areaPopupTemplateCompiled = template(areaPopupTemplate, templateSettings);
 
 L.Control.Measure = L.Control.extend({
   _className: 'leaflet-control-measure',
+
   options: {
+    translations: en,
     units: {},
     controls: true,
     measure: {
@@ -92,7 +95,8 @@ L.Control.Measure = L.Control.extend({
     container.innerHTML = controlTemplateCompiled({
       model: {
         className: className
-      }
+      },
+      tr: this.options.translations
     });
 
     // makes this work on IE touch devices by stopping it from firing a mouseout event when the touch is released
@@ -326,7 +330,8 @@ L.Control.Measure = L.Control.extend({
         pointCount: this._latlngs.length
       }
     ));
-    this.$results.innerHTML = resultsTemplateCompiled({ model });
+    const tr = this.options.translations;
+    this.$results.innerHTML = resultsTemplateCompiled({ model, tr });
   },
   // mouse move handler while measure in progress
   // adds floating measure marker under cursor
@@ -357,21 +362,28 @@ L.Control.Measure = L.Control.extend({
     }
 
     const calced = calc(latlngs);
+    const tr = this.options.translations;
 
     if (latlngs.length === 1) {
       resultFeature = L.circleMarker(latlngs[0], this._symbols.getSymbol('resultPoint'));
       popupContent = pointPopupTemplateCompiled({
-        model: calced
+        model: calced,
+        tr
       });
-    } else if (latlngs.length === 2) {
+    } else if (
+      latlngs.length === 2 ||
+      (latlngs.length > 2 && this.options.measure.length && !this.options.measure.area)
+    ) {
       resultFeature = L.polyline(latlngs, this._symbols.getSymbol('resultLine'));
       popupContent = linePopupTemplateCompiled({
-        model: L.extend({}, calced, this._getMeasurementDisplayStrings(calced))
+        model: L.extend({}, calced, this._getMeasurementDisplayStrings(calced)),
+        tr
       });
     } else {
       resultFeature = L.polygon(latlngs, this._symbols.getSymbol('resultArea'));
       popupContent = areaPopupTemplateCompiled({
-        model: L.extend({}, calced, this._getMeasurementDisplayStrings(calced))
+        model: L.extend({}, calced, this._getMeasurementDisplayStrings(calced)),
+        tr
       });
     }
 
@@ -454,6 +466,7 @@ L.Control.Measure = L.Control.extend({
     this._updateResults();
     this._updateMeasureStartedWithPoints();
   },
+
   // handle map mouse out during ongoing measure
   // remove floating cursor vertex from map
   _handleMapMouseOut: function() {
@@ -462,6 +475,7 @@ L.Control.Measure = L.Control.extend({
       this._measureDrag = null;
     }
   },
+
   // add various measure graphics to map - vertex, area, boundary
   _addNewVertex: function(latlng) {
     const vertexMarker = L.circleMarker(latlng, this._symbols.getSymbol('measureVertexActive'));
@@ -475,7 +489,10 @@ L.Control.Measure = L.Control.extend({
 
     vertexMarker.addTo(this._measureVertexes);
   },
+
   _addMeasureArea: function(latlngs) {
+    if (!this.options.measure.area) return;
+
     if (latlngs.length < 3) {
       if (this._measureArea) {
         this._layer.removeLayer(this._measureArea);
@@ -491,6 +508,7 @@ L.Control.Measure = L.Control.extend({
       this._measureArea.setLatLngs(latlngs);
     }
   },
+
   _addMeasureBoundary: function(latlngs) {
     if (latlngs.length < 2) {
       if (this._measureBoundary) {

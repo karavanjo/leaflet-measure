@@ -1,9 +1,7 @@
-const glob = require('glob');
 const resolve = require('path').resolve;
 
 const CopyPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const I18nPlugin = require('i18n-webpack-plugin');
 
 const BUILD_DIR = resolve(__dirname, 'dist');
 
@@ -34,30 +32,15 @@ const scssLoader = {
   })
 };
 
-// Build for all languages in the in `./languages` using I18nPlugin
-const languages = glob.sync('./languages/*.json').reduce(
-  (dict, filePath) => {
-    const match = /\/languages\/(.+).json/.exec(filePath);
-    dict[match[1]] = require(filePath);
-    return dict;
+module.exports = {
+  entry: ['./src/leaflet-measure.js'],
+  output: {
+    filename: `leaflet-measure.js`,
+    path: BUILD_DIR,
+    publicPath: '/dist/'
   },
-  {
-    default: require(`./languages/en.json`)
-  }
-);
-
-module.exports = Object.keys(languages).map(language => {
-  const langPrefix = language === 'default' ? '' : `.${language}`;
-  return {
-    entry: ['./src/leaflet-measure.js'],
-    output: {
-      filename: `leaflet-measure${langPrefix}.js`,
-      path: BUILD_DIR,
-      publicPath: '/dist/'
-    },
-    module: {
-      rules: [jsLoader, htmlLoader, scssLoader]
-    },
-    plugins: [copySite, copyAssets, extractSass, new I18nPlugin(languages[language])]
-  };
-});
+  module: {
+    rules: [jsLoader, htmlLoader, scssLoader]
+  },
+  plugins: [copySite, copyAssets, extractSass]
+};
