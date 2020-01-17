@@ -6,7 +6,6 @@ env:
   browser: true
 globals:
   L: true
-  __: true
 rules:
   no-multiple-empty-lines:
     - error

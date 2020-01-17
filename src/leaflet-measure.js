@@ -30,6 +30,7 @@ const areaPopupTemplateCompiled = template(areaPopupTemplate, templateSettings);
 
 L.Control.Measure = L.Control.extend({
   _className: 'leaflet-control-measure',
+  _defaultTranslations: en,
 
   options: {
     translations: en,
@@ -92,11 +93,8 @@ L.Control.Measure = L.Control.extend({
     const className = this._className,
       container = (this._container = L.DomUtil.create('div', `${className} leaflet-bar`));
 
-    container.innerHTML = controlTemplateCompiled({
-      model: {
-        className: className
-      },
-      tr: this.options.translations
+    container.innerHTML = this._getHtml(controlTemplateCompiled, {
+      className: className
     });
 
     // makes this work on IE touch devices by stopping it from firing a mouseout event when the touch is released
@@ -256,20 +254,60 @@ L.Control.Measure = L.Control.extend({
       })
     );
   },
-  // format measurements to nice display string based on units in options
-  // `{ lengthDisplay: '100 Feet (0.02 Miles)', areaDisplay: ... }`
-  _getMeasurementDisplayStrings: function(measurement) {
-    const unitDefinitions = this.options.units;
 
+  _formatMeasure: function(val, unit, decPoint, thousandsSep) {
+    const __ = this.__.bind(this);
+    const unitDisplays = {
+      acres: __('acres'),
+      feet: __('feet'),
+      kilometers: __('kilometers'),
+      hectares: __('hectares'),
+      meters: __('meters'),
+      miles: __('miles'),
+      sqfeet: __('sqfeet'),
+      sqmeters: __('sqmeters'),
+      sqmiles: __('sqmiles')
+    };
+
+    const u = L.extend({ factor: 1, decimals: 0 }, unit);
+    const formattedNumber = numberFormat(
+      val * u.factor,
+      u.decimals,
+      decPoint || __('decPoint'),
+      thousandsSep || __('thousandsSep')
+    );
+    const label = unitDisplays[u.display] || u.display;
+    return [formattedNumber, label].join(' ');
+  },
+
+  _buildDisplay: function(val, primaryUnit, secondaryUnit, decPoint, thousandsSep) {
+    const unitDefinitions = this.options.units;
+    if (primaryUnit && unitDefinitions[primaryUnit]) {
+      let display = this._formatMeasure(val, unitDefinitions[primaryUnit], decPoint, thousandsSep);
+      if (secondaryUnit && unitDefinitions[secondaryUnit]) {
+        const formatted = this._formatMeasure(
+          val,
+          unitDefinitions[secondaryUnit],
+          decPoint,
+          thousandsSep
+        );
+        display = `${display} (${formatted})`;
+      }
+      return display;
+    }
+    return this._formatMeasure(val, null, decPoint, thousandsSep);
+  },
+
+  _getMeasurementDisplayStrings: function(measurement) {
     return {
-      lengthDisplay: buildDisplay(
+      lengthDisplay: this._buildDisplay(
         measurement.length,
         this.options.primaryLengthUnit,
         this.options.secondaryLengthUnit,
         this.options.decPoint,
         this.options.thousandsSep
       ),
-      areaDisplay: buildDisplay(
+      areaDisplay: this._buildDisplay(
         measurement.area,
         this.options.primaryAreaUnit,
         this.options.secondaryAreaUnit,
@@ -277,47 +315,6 @@ L.Control.Measure = L.Control.extend({
         this.options.thousandsSep
       )
     };
-
-    function buildDisplay(val, primaryUnit, secondaryUnit, decPoint, thousandsSep) {
-      if (primaryUnit && unitDefinitions[primaryUnit]) {
-        let display = formatMeasure(val, unitDefinitions[primaryUnit], decPoint, thousandsSep);
-        if (secondaryUnit && unitDefinitions[secondaryUnit]) {
-          const formatted = formatMeasure(
-            val,
-            unitDefinitions[secondaryUnit],
-            decPoint,
-            thousandsSep
-          );
-          display = `${display} (${formatted})`;
-        }
-        return display;
-      }
-      return formatMeasure(val, null, decPoint, thousandsSep);
-    }
-
-    function formatMeasure(val, unit, decPoint, thousandsSep) {
-      const unitDisplays = {
-        acres: __('acres'),
-        feet: __('feet'),
-        kilometers: __('kilometers'),
-        hectares: __('hectares'),
-        meters: __('meters'),
-        miles: __('miles'),
-        sqfeet: __('sqfeet'),
-        sqmeters: __('sqmeters'),
-        sqmiles: __('sqmiles')
-      };
-
-      const u = L.extend({ factor: 1, decimals: 0 }, unit);
-      const formattedNumber = numberFormat(
-        val * u.factor,
-        u.decimals,
-        decPoint || __('decPoint'),
-        thousandsSep || __('thousandsSep')
-      );
-      const label = unitDisplays[u.display] || u.display;
-      return [formattedNumber, label].join(' ');
-    }
   },
   // update results area of dom with calced measure from `this._latlngs`
   _updateResults: function() {
@@ -330,8 +327,7 @@ L.Control.Measure = L.Control.extend({
         pointCount: this._latlngs.length
       }
     ));
-    const tr = this.options.translations;
-    this.$results.innerHTML = resultsTemplateCompiled({ model, tr });
+    this._getHtml(resultsTemplateCompiled, model);
   },
   // mouse move handler while measure in progress
   // adds floating measure marker under cursor
@@ -362,29 +358,25 @@ L.Control.Measure = L.Control.extend({
     }
 
     const calced = calc(latlngs);
-    const tr = this.options.translations;
 
     if (latlngs.length === 1) {
       resultFeature = L.circleMarker(latlngs[0], this._symbols.getSymbol('resultPoint'));
-      popupContent = pointPopupTemplateCompiled({
-        model: calced,
-        tr
-      });
+      popupContent = this._getHtml(pointPopupTemplateCompiled, calced);
     } else if (
       latlngs.length === 2 ||
       (latlngs.length > 2 && this.options.measure.length && !this.options.measure.area)
     ) {
       resultFeature = L.polyline(latlngs, this._symbols.getSymbol('resultLine'));
-      popupContent = linePopupTemplateCompiled({
-        model: L.extend({}, calced, this._getMeasurementDisplayStrings(calced)),
-        tr
-      });
+      popupContent = this._getHtml(
+        linePopupTemplateCompiled,
+        L.extend({}, calced, this._getMeasurementDisplayStrings(calced))
+      );
     } else {
       resultFeature = L.polygon(latlngs, this._symbols.getSymbol('resultArea'));
-      popupContent = areaPopupTemplateCompiled({
-        model: L.extend({}, calced, this._getMeasurementDisplayStrings(calced)),
-        tr
-      });
+      popupContent = this._getHtml(
+        areaPopupTemplateCompiled,
+        L.extend({}, calced, this._getMeasurementDisplayStrings(calced))
+      );
     }
 
     const popupContainer = L.DomUtil.create('div', '');
@@ -524,6 +516,21 @@ L.Control.Measure = L.Control.extend({
     } else {
       this._measureBoundary.setLatLngs(latlngs);
     }
+  },
+
+  __: function(key) {
+    const { translations } = this.options;
+    if (!translations || !translations[key]) {
+      return this._defaultTranslations[key];
+    }
+    return translations[key];
+  },
+
+  _getHtml: function(templateCompiled, model) {
+    return templateCompiled({
+      model,
+      __: this.__.bind(this)
+    });
   }
 });
 
