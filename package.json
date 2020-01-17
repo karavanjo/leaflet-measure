@@ -40,31 +40,32 @@
     ]
   },
   "dependencies": {
-    "@turf/area": "^5.1.5",
-    "@turf/length": "^5.1.5",
-    "lodash": "^4.17.5"
+    "@turf/area": "^6.0.1",
+    "@turf/length": "^6.0.2",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-preset-env": "^1.6.1",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.0.6",
+    "babel-preset-env": "^1.7.0",
     "babel-runtime": "^6.26.0",
-    "copy-webpack-plugin": "^4.4.1",
-    "css-loader": "^0.28.9",
-    "eslint": "^4.17.0",
-    "eslint-plugin-import": "^2.8.0",
-    "extract-text-webpack-plugin": "^3.0.2",
-    "gh-pages": "^1.1.0",
-    "glob": "^7.1.2",
+    "copy-webpack-plugin": "^5.1.1",
+    "css-loader": "^3.4.2",
+    "eslint": "^6.8.0",
+    "eslint-plugin-import": "^2.20.0",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "gh-pages": "^2.2.0",
+    "glob": "^7.1.6",
     "html-loader": "^0.5.5",
-    "husky": "^0.14.3",
-    "lint-staged": "^6.1.0",
-    "node-sass": "^4.7.2",
-    "prettier": "^1.10.2",
-    "sass-loader": "^6.0.6",
-    "style-loader": "^0.20.1",
-    "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.11.1"
+    "husky": "^4.0.10",
+    "lint-staged": "^9.5.0",
+    "node-sass": "^4.13.1",
+    "prettier": "^1.19.1",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.1.2",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1"
   },
   "peerDependencies": {
     "leaflet": "^1.6.0"
