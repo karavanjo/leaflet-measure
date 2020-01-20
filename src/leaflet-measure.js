@@ -327,7 +327,7 @@ L.Control.Measure = L.Control.extend({
         pointCount: this._latlngs.length
       }
     ));
-    this._getHtml(resultsTemplateCompiled, model);
+    this.$results.innerHTML = this._getHtml(resultsTemplateCompiled, model);
   },
   // mouse move handler while measure in progress
   // adds floating measure marker under cursor
@@ -544,6 +544,10 @@ L.Map.addInitHook(function() {
   }
 });
 
-L.control.measure = function(options) {
+const measure = function(options) {
   return new L.Control.Measure(options);
 };
+
+L.control.measure = measure;
+
+export default measure;

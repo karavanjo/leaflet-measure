@@ -13,7 +13,12 @@ const extractSass = new ExtractTextPlugin({ filename: 'leaflet-measure.css' });
 
 const htmlLoader = {
   test: /\.html$/,
-  use: { loader: 'html-loader?interpolate' }
+  use: {
+    loader: 'html-loader?interpolate',
+    options: {
+      interpolate: true
+    }
+  }
 };
 
 const scssLoader = {

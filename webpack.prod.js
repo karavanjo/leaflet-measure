@@ -5,7 +5,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const BUILD_DIR = resolve(__dirname, 'dist');
 
-const copyAssets = new CopyPlugin([{ from: './assets', to: 'assets', ignore: '*.svg' }]);
+const copyAssets = new CopyPlugin([{ from: './assets', to: 'assets', ignore: ['*.svg'] }]);
 const copySite = new CopyPlugin([{ from: './example', to: './' }]);
 
 const extractSass = new ExtractTextPlugin({ filename: 'leaflet-measure.css' });
@@ -15,7 +15,7 @@ const jsLoader = {
   exclude: /node_modules/,
   use: {
     loader: 'babel-loader?optional=runtime',
-    options: { presets: ['babel-preset-env'] }
+    options: { presets: ['@babel/preset-env'] }
   }
 };
 

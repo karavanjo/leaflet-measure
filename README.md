@@ -3,7 +3,16 @@
 Modified coordinate, linear, and area measure control for [Leaflet](http://leafletjs.com) maps. 
 Forked from base [leaflet-measure](https://github.com/ljagis/leaflet-measure) repository.
 
+## Localization
 
+The library using English translations by default. 
+If you need to set new language you can specify your translations in options parameter `translations` like this:
+
+```javascript
+var myMap = L.map('mapElementId', options);
+var measureControl = new L.Control.Measure(options);
+measureControl.addTo(myMap);
+```
 
 <hr>
 

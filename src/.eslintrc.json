@@ -1,0 +1,17 @@
+{
+  "extends": "../.eslintrc.json",
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "L": true
+  },
+  "rules": {
+    "no-multiple-empty-lines": "error",
+    "no-var": "error",
+    "prefer-const": "error"
+  }
+}
