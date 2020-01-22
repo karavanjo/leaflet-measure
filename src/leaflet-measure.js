@@ -327,6 +327,7 @@ L.Control.Measure = L.Control.extend({
         pointCount: this._latlngs.length
       }
     ));
+    this._map.fire('measurechanged', model, false);
     this.$results.innerHTML = this._getHtml(resultsTemplateCompiled, model);
   },
   // mouse move handler while measure in progress

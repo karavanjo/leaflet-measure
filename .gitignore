@@ -1,5 +1,10 @@
+.idea
 .DS_Store
 .sass-cache
 node_modules
 dist
 package-lock.json
+*.rej
+cypress/plugins
+cypress/support
+cypress/videos
