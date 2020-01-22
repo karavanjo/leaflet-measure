@@ -5,7 +5,7 @@
   "main": "dist/leaflet-measure.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/nextgis/leaflet-measure"
+    "url": "git://github.com/karavanjo/leaflet-measure"
   },
   "keywords": [
     "leaflet",

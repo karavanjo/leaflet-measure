@@ -6,7 +6,7 @@ import units from './units';
 import calc from './calc';
 import * as dom from './dom';
 import { selectOne as $ } from './dom';
-import Symbology from './symbology';
+import Symbology, { DEFAULT_OPTIONS } from './symbology';
 import { numberFormat } from './utils';
 import en from '../languages/en';
 
@@ -33,6 +33,10 @@ L.Control.Measure = L.Control.extend({
   _defaultTranslations: en,
 
   options: {
+    colors: {
+      active: DEFAULT_OPTIONS.activeColor, // base color for map features while actively measuring
+      completed: DEFAULT_OPTIONS.completedColor // base color for permenant features generated from completed measure
+    },
     translations: en,
     units: {},
     ui: {
@@ -48,8 +52,6 @@ L.Control.Measure = L.Control.extend({
     primaryLengthUnit: 'feet',
     secondaryLengthUnit: 'miles',
     primaryAreaUnit: 'acres',
-    activeColor: '#ABE67E', // base color for map features while actively measuring
-    completedColor: '#C8F2BE', // base color for permenant features generated from completed measure
     captureZIndex: 10000, // z-index of the marker used to capture measure events
     popupOptions: {
       className: 'leaflet-measure-resultpopup',
@@ -59,8 +61,11 @@ L.Control.Measure = L.Control.extend({
 
   initialize: function(options) {
     L.setOptions(this, options);
-    const { activeColor, completedColor } = this.options;
-    this._symbols = new Symbology({ activeColor, completedColor });
+    const { colors } = this.options;
+    this._symbols = new Symbology({
+      activeColor: colors.active,
+      completedColor: colors.completed
+    });
     this.options.units = L.extend({}, units, this.options.units);
   },
 
@@ -136,18 +141,19 @@ L.Control.Measure = L.Control.extend({
     L.DomEvent.on($finish, 'click', L.DomEvent.stop);
     L.DomEvent.on($finish, 'click', this._handleMeasureDoubleClick, this);
   },
+
   _expand: function() {
     dom.hide(this.$toggle);
     dom.show(this.$interaction);
   },
+
   _collapse: function() {
     if (!this._locked) {
       dom.hide(this.$interaction);
       dom.show(this.$toggle);
     }
   },
-  // move between basic states:
-  // measure not started, started/in progress but no points added, in progress and with points
+
   _updateMeasureNotStarted: function() {
     dom.hide(this.$startHelp);
     dom.hide(this.$results);
@@ -321,6 +327,7 @@ L.Control.Measure = L.Control.extend({
       )
     };
   },
+
   // update results area of dom with calced measure from `this._latlngs`
   _updateResults: function() {
     const calced = calc(this._latlngs);
@@ -338,6 +345,7 @@ L.Control.Measure = L.Control.extend({
       this.$results.innerHTML = this._getHtml(resultsTemplateCompiled, model);
     }
   },
+
   // mouse move handler while measure in progress
   // adds floating measure marker under cursor
   _handleMeasureMove: function(evt) {
@@ -350,6 +358,7 @@ L.Control.Measure = L.Control.extend({
     }
     this._measureDrag.bringToFront();
   },
+
   // handler for both double click and clicking finish button
   // do final calc and finish out current measure, clear dom and internal state, add permanent map features
   _handleMeasureDoubleClick: function() {

@@ -1,4 +1,4 @@
-const DEFAULT_OPTIONS = {
+export const DEFAULT_OPTIONS = {
   activeColor: '#ABE67E',
   completedColor: '#C8F2BE'
 };
