@@ -80,7 +80,10 @@
 <script>
   (function(L, document) {
     var measureControl = new L.Control.Measure({
-      controls: false
+      ui: {
+        control: false,
+        popup: false
+      }
     });
 
     var map = L.map('map', {

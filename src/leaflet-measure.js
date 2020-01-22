@@ -35,12 +35,15 @@ L.Control.Measure = L.Control.extend({
   options: {
     translations: en,
     units: {},
-    controls: true,
+    ui: {
+      control: true,
+      popup: true,
+      labels: false
+    },
     measure: {
       area: true,
       length: true
     },
-    labels: true,
     position: 'topright',
     primaryLengthUnit: 'feet',
     secondaryLengthUnit: 'miles',
@@ -65,7 +68,7 @@ L.Control.Measure = L.Control.extend({
     this._map = map;
     this._latlngs = [];
 
-    if (this.options.controls) {
+    if (this.options.ui && this.options.ui.control) {
       this._initLayout();
       map.on('click', this._collapse, this);
     } else {
@@ -152,6 +155,7 @@ L.Control.Measure = L.Control.extend({
     dom.hide(this.$measuringPrompt);
     dom.show(this.$startPrompt);
   },
+
   _updateMeasureStartedNoPoints: function() {
     dom.hide(this.$results);
     dom.show(this.$startHelp);
@@ -159,6 +163,7 @@ L.Control.Measure = L.Control.extend({
     dom.hide(this.$startPrompt);
     dom.show(this.$measuringPrompt);
   },
+
   _updateMeasureStartedWithPoints: function() {
     dom.hide(this.$startHelp);
     dom.show(this.$results);
@@ -328,7 +333,10 @@ L.Control.Measure = L.Control.extend({
       }
     ));
     this._map.fire('measurechanged', model, false);
-    this.$results.innerHTML = this._getHtml(resultsTemplateCompiled, model);
+
+    if (this.options.ui && this.options.ui.control) {
+      this.$results.innerHTML = this._getHtml(resultsTemplateCompiled, model);
+    }
   },
   // mouse move handler while measure in progress
   // adds floating measure marker under cursor
@@ -380,6 +388,14 @@ L.Control.Measure = L.Control.extend({
       );
     }
 
+    resultFeature.addTo(this._layer);
+
+    if (this.options.ui && this.options.ui.popup) {
+      this._buildPopupContainer(popupContent, resultFeature);
+    }
+  },
+
+  _buildPopupContainer: function(popupContent, resultFeature) {
     const popupContainer = L.DomUtil.create('div', '');
     popupContainer.innerHTML = popupContent;
 
@@ -417,7 +433,6 @@ L.Control.Measure = L.Control.extend({
       );
     }
 
-    resultFeature.addTo(this._layer);
     resultFeature.bindPopup(popupContainer, this.options.popupOptions);
     if (resultFeature.getBounds) {
       resultFeature.openPopup(resultFeature.getBounds().getCenter());
@@ -425,6 +440,7 @@ L.Control.Measure = L.Control.extend({
       resultFeature.openPopup(resultFeature.getLatLng());
     }
   },
+
   // handle map click during ongoing measurement
   // add new clicked point, update measure layers and results ui
   _handleMeasureClick: function(evt) {
