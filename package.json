@@ -1,6 +1,6 @@
 {
   "name": "@nextgis/leaflet-measure",
-  "version": "0.0.1",
+  "version": "3.1.1",
   "description": "Coordinate, linear, and area measure tool for Leaflet maps",
   "main": "dist/leaflet-measure.js",
   "repository": {
