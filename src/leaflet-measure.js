@@ -31,8 +31,13 @@ const areaPopupTemplateCompiled = template(areaPopupTemplate, templateSettings);
 L.Control.Measure = L.Control.extend({
   _className: 'leaflet-control-measure',
   _defaultTranslations: en,
+  _previousMeasureFeature: null,
 
   options: {
+    behavior: {
+      clearPreviousFeature: false,
+      continuousMeasure: false
+    },
     colors: {
       active: DEFAULT_OPTIONS.activeColor, // base color for map features while actively measuring
       completed: DEFAULT_OPTIONS.completedColor // base color for permenant features generated from completed measure
@@ -398,10 +403,13 @@ L.Control.Measure = L.Control.extend({
     }
 
     resultFeature.addTo(this._layer);
+    this._resultFeature = resultFeature;
 
     if (this.options.ui && this.options.ui.popup) {
       this._buildPopupContainer(popupContent, resultFeature);
     }
+
+    if (this.options.behavior.continuousMeasure) this._startMeasure();
   },
 
   _buildPopupContainer: function(popupContent, resultFeature) {
@@ -454,8 +462,13 @@ L.Control.Measure = L.Control.extend({
   // add new clicked point, update measure layers and results ui
   _handleMeasureClick: function(evt) {
     const latlng = this._map.mouseEventToLatLng(evt.originalEvent), // get actual latlng instead of the marker's latlng from originalEvent
-      lastClick = this._latlngs[this._latlngs.length - 1],
+      countExistingPoints = this._latlngs.length,
+      lastClick = this._latlngs[countExistingPoints - 1],
       vertexSymbol = this._symbols.getSymbol('measureVertex');
+
+    if (this.options.behavior.clearPreviousFeature && countExistingPoints === 0) {
+      if (this._resultFeature) this._layer.removeLayer(this._resultFeature);
+    }
 
     if (!lastClick || !latlng.equals(lastClick)) {
       // skip if same point as last click, happens on `dblclick`
