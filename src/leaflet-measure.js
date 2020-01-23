@@ -100,6 +100,7 @@ L.Control.Measure = L.Control.extend({
 
   finish: function() {
     this._finishMeasure();
+    this._layer.clearLayers();
   },
 
   _initLayout: function() {
@@ -232,8 +233,10 @@ L.Control.Measure = L.Control.extend({
       .off('move', this._centerCaptureMarker, this)
       .off('resize', this._setCaptureMarkerIcon, this);
 
-    this._layer.removeLayer(this._measureVertexes).removeLayer(this._captureMarker);
-    this._measureVertexes = null;
+    if (this._measureVertexes) {
+      this._layer.removeLayer(this._measureVertexes).removeLayer(this._captureMarker);
+      this._measureVertexes = null;
+    }
 
     this._updateMeasureNotStarted();
     this._collapse();

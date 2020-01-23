@@ -51,4 +51,22 @@ describe('UI controls behavior', () => {
       .find('.measure-label')
       .should('have.length', 2);
   });
+
+  it('Finish measuring correctly if measuring now', () => {
+    cy.visit('localhost:8080/measure.html?options={"ui":{"control":false}}');
+    cy.get('#start').click();
+    cy.get('body').click(114, 257);
+    cy.get('body').click(152, 318);
+    cy.get('#finish').click();
+  });
+
+  it('Finish measuring clearing popup if measuring finished', () => {
+    cy.visit('localhost:8080/measure.html?options={"ui":{"control":false}}');
+    cy.get('#start').click();
+    cy.get('body').click(114, 257);
+    cy.get('body').click(152, 318);
+    cy.get('body').dblclick(233, 278);
+    cy.get('#finish').click();
+    cy.get('.leaflet-measure-resultpopup').should('not.exist');
+  });
 });
