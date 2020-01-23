@@ -22,15 +22,7 @@
       margin: 0 20px 20px;
     }
 
-    h1, h2 {
-      margin: 20px 0 0;
-      font-size: 1.4em;
-      font-weight: normal;
-      line-height: 1;
-    }
-
     h1 {
-      display: inline-block;
       font-size: 1.4em;
     }
 
@@ -44,7 +36,6 @@
 
     p.github {
       display: inline-block;
-      margin: 20px 0 0 20px;
       font-size: 1.2em;
     }
 
@@ -54,29 +45,31 @@
 
     #map {
       height: 500px;
+      width: 500px;
       margin: 20px 20px 0 0;
     }
 
     .controls {
-      margin-top: 5px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-<h1>@nextgis/leaflet-measure</h1>
-<p class="github"><a href="https://github.com/nextgis/leaflet-measure">github.com/nextgis/leaflet-measure</a></p>
+<h1><a href="/">@nextgis/leaflet-measure</a></h1>
+<h2><a href="https://github.com/karavanjo/leaflet-measure">github.com/karavanjo/leaflet-measure</a></h2>
 
 <div id="map"></div>
 
 <div class="controls">
-  <button id="start">Start</button>
-  <button id="finish">Finish</button>
+  <button id="start">Start measuring</button>
+  <button id="finish">Finish measuring</button>
 </div>
-<h2><code>measurefinish</code> event data:</h2>
+<h2><code>Event data:</code></h2>
 <pre id="eventoutput">...</pre>
 <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
         integrity="sha384-wKOriz2x8/bF1D9t6PuKhSpxfhHeVi9huvyuxJrrShSJpi5+rmRIsM90UuWbdAYJ" crossorigin=""></script>
 <script src="leaflet-measure.js"></script>
+
 <script>
   (function(L, document) {
     var translation_ru = {
@@ -134,13 +127,22 @@
       measureControl.finish();
     });
 
-    map.on('measurefinish', function(evt) {
-      writeResults(evt);
+    map.on('measurestart', function(evt) {
+      writeResults('measurestart', evt);
     });
 
-    function writeResults(results) {
+    map.on('measurefinish', function(evt) {
+      writeResults('measurefinish', evt);
+    });
+
+    map.on('measurechanged', function(evt) {
+      writeResults('measurechanged', evt);
+    });
+
+    function writeResults(event, results) {
       document.getElementById('eventoutput').innerHTML = JSON.stringify(
         {
+          event: event,
           area: results.area,
           areaDisplay: results.areaDisplay,
           lastCoord: results.lastCoord,

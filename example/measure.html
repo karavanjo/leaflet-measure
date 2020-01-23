@@ -97,13 +97,22 @@
       measureControl.finish();
     });
 
-    map.on('measurefinish', function(evt) {
-      writeResults(evt);
+    map.on('measurestart', function(evt) {
+      writeResults('measurestart', evt);
     });
 
-    function writeResults(results) {
+    map.on('measurefinish', function(evt) {
+      writeResults('measurefinish', evt);
+    });
+
+    map.on('measurechanged', function(evt) {
+      writeResults('measurechanged', evt);
+    });
+
+    function writeResults(event, results) {
       document.getElementById('eventoutput').innerHTML = JSON.stringify(
         {
+          event: event,
           area: results.area,
           areaDisplay: results.areaDisplay,
           lastCoord: results.lastCoord,
