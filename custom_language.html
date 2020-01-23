@@ -1,0 +1,161 @@
+<!doctype HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>leaflet-measure</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha384-eS4bw6aEvhCSXWGP85ANR/N8isWKzT7P36NvcuTJGkrj6wsbxLVpXslrNXYHyseD"
+        crossorigin=""/>
+  <link rel="stylesheet" href="leaflet-measure.css">
+  <style>
+    body {
+      font-size: 14px;
+      font-family: Helvetica, sans-serif;
+      font-weight: 400;
+      line-height: 1;
+      color: #222;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      margin: 0 20px 20px;
+    }
+
+    h1 {
+      font-size: 1.4em;
+    }
+
+    h2 {
+      font-size: 1.1em;
+    }
+
+    pre {
+      line-height: 1.5em;
+    }
+
+    p.github {
+      display: inline-block;
+      font-size: 1.2em;
+    }
+
+    a, a:visited, a:hover, a:active, a:focus {
+      text-decoration: none;
+    }
+
+    #map {
+      height: 500px;
+      width: 500px;
+      margin: 20px 20px 0 0;
+    }
+
+    .controls {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<h1><a href="/">@nextgis/leaflet-measure</a></h1>
+<h2><a href="https://github.com/karavanjo/leaflet-measure">github.com/karavanjo/leaflet-measure</a></h2>
+
+<div id="map"></div>
+
+<div class="controls">
+  <button id="start">Start measuring</button>
+  <button id="finish">Finish measuring</button>
+</div>
+<h2><code>Event data:</code></h2>
+<pre id="eventoutput">...</pre>
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha384-wKOriz2x8/bF1D9t6PuKhSpxfhHeVi9huvyuxJrrShSJpi5+rmRIsM90UuWbdAYJ" crossorigin=""></script>
+<script src="leaflet-measure.js"></script>
+
+<script>
+  (function(L, document) {
+    var translation_ru = {
+      'measure': 'Измерение',
+      'measureDistancesAndAreas': 'Измерение расстояний и площади',
+      'createNewMeasurement': 'Создать новое измерение',
+      'startCreating': 'Для начала измерения добавьте точку на карту',
+      'finishMeasurement': 'Закончить измерение',
+      'lastPoint': 'Последняя точка',
+      'area': 'Область',
+      'perimeter': 'Периметр',
+      'pointLocation': 'Местоположение точки',
+      'areaMeasurement': 'Измерение области',
+      'linearMeasurement': 'Линейное измерение',
+      'pathDistance': 'Расстояние',
+      'centerOnArea': 'Сфокусироваться на данной области',
+      'centerOnLine': 'Сфокусироваться на данной линии',
+      'centerOnLocation': 'Сфокусироваться на данной местности',
+      'cancel': 'Отменить',
+      'delete': 'Удалить',
+      'acres': 'акры',
+      'feet': 'фут',
+      'kilometers': 'км',
+      'hectares': 'га',
+      'meters': 'м',
+      'miles': 'миль',
+      'sqfeet': 'футов²',
+      'sqmeters': 'м²',
+      'sqmiles': 'миль²',
+      'decPoint': '.',
+      'thousandsSep': ','
+    };
+
+    var measureControl = new L.Control.Measure({
+      translations: translation_ru
+    });
+
+    var map = L.map('map', {
+      center: [29.749817, -95.080757],
+      zoom: 16
+    });
+    L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      minZoom: 14,
+      maxZoom: 18,
+      attribution: '&copy; Esri &mdash; Sources: Esri, DigitalGlobe, Earthstar Geographics, CNES/Airbus DS, GeoEye, USDA FSA, USGS, Getmapping, Aerogrid, IGN, IGP, swisstopo, and the GIS User Community'
+    }).addTo(map);
+
+    measureControl.addTo(map);
+
+    document.getElementById('start').addEventListener('click', function() {
+      measureControl.start();
+    });
+
+    document.getElementById('finish').addEventListener('click', function() {
+      measureControl.finish();
+    });
+
+    map.on('measurestart', function(evt) {
+      writeResults('measurestart', evt);
+    });
+
+    map.on('measurefinish', function(evt) {
+      writeResults('measurefinish', evt);
+    });
+
+    map.on('measurechanged', function(evt) {
+      writeResults('measurechanged', evt);
+    });
+
+    function writeResults(event, results) {
+      document.getElementById('eventoutput').innerHTML = JSON.stringify(
+        {
+          event: event,
+          area: results.area,
+          areaDisplay: results.areaDisplay,
+          lastCoord: results.lastCoord,
+          length: results.length,
+          lengthDisplay: results.lengthDisplay,
+          pointCount: results.pointCount,
+          points: results.points
+        },
+        null,
+        2
+      );
+    }
+  })(window.L, window.document);
+</script>
+</body>
+</html>
