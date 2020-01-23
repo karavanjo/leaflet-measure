@@ -24,4 +24,31 @@ describe('UI controls behavior', () => {
     cy.get('body').dblclick(233, 278);
     cy.get('.leaflet-measure-resultpopup').should('be.visible');
   });
+
+  it('Hide labels during measuring (by default)', () => {
+    cy.visit('localhost:8080/measure.html');
+    cy.get('a.leaflet-control-measure-toggle').trigger('mouseover');
+    cy.get('a.js-start').click();
+    cy.get('body').click(114, 257);
+    cy.get('.measure-label').should('not.exist');
+  });
+
+  it('Display labels during measuring if that was specified', () => {
+    cy.visit('localhost:8080/measure.html?options={"ui":{"labels":true, "control":true}}');
+    cy.get('a.leaflet-control-measure-toggle').trigger('mouseover');
+    cy.get('a.js-start').click();
+    cy.get('body').click(114, 257);
+    cy.get('.measure-label').should('be.visible');
+  });
+
+  it('Display labels for every point of measure', () => {
+    cy.visit('localhost:8080/measure.html?options={"ui":{"labels":true, "control":true}}');
+    cy.get('a.leaflet-control-measure-toggle').trigger('mouseover');
+    cy.get('a.js-start').click();
+    cy.get('body').click(114, 257);
+    cy.get('body').click(152, 318);
+    cy.get('body')
+      .find('.measure-label')
+      .should('have.length', 2);
+  });
 });

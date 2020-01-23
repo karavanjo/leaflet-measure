@@ -486,15 +486,17 @@ L.Control.Measure = L.Control.extend({
         }
       });
 
+      this._updateResults();
       this._addNewVertex(latlng);
 
       if (this._measureBoundary) {
         this._measureBoundary.bringToFront();
       }
       this._measureVertexes.bringToFront();
+    } else {
+      this._updateResults();
     }
 
-    this._updateResults();
     this._updateMeasureStartedWithPoints();
   },
 
@@ -511,14 +513,30 @@ L.Control.Measure = L.Control.extend({
   _addNewVertex: function(latlng) {
     const vertexMarker = L.circleMarker(latlng, this._symbols.getSymbol('measureVertexActive'));
 
-    if (this.options.labels) {
-      vertexMarker.bindTooltip('Test Label', {
+    if (this.options.ui.labels) {
+      const tooltipMessage = this._getTooltipMessage();
+      vertexMarker.bindTooltip(tooltipMessage, {
         permanent: true,
-        direction: 'left'
+        direction: 'left',
+        className: 'measure-label'
       });
     }
 
     vertexMarker.addTo(this._measureVertexes);
+  },
+
+  _getTooltipMessage: function() {
+    const resultsModel = this._resultsModel;
+    const content = [];
+
+    if (this.options.measure.length) {
+      content.push(resultsModel.lengthDisplay);
+    }
+    if (this.options.measure.area) {
+      content.push(resultsModel.areaDisplay);
+    }
+
+    return content.join('<br/>');
   },
 
   _addMeasureArea: function(latlngs) {
